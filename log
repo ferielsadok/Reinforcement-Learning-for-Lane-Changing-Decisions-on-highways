@@ -1,19 +1,19 @@
-***Starting server on port 52693 ***
-Loading net-file from 'data/obstacles.net.xml' ... done (3ms).
-Loading route-files incrementally from 'data/obstacles.rou.xml'
+***Starting server on port 63068 ***
+Loading net-file from 'data/obstacles.net.xml' ... done (1ms).
 Loading done.
 Simulation started with time: 0.00.
 Warning: Departure time for vehicle 'vehAgent' is in the past; using current time instead.
-Simulation ended at time: 202.00.
+Simulation ended at time: 202.00
 Reason: TraCI requested termination.
-Performance:
- Duration: 7.07s
- TraCI-Duration: 0.67s
- Real time factor: 28.5633
- UPS: 599.688914
-Vehicles:
+Performance: 
+ Duration: 2.23s
+ TraCI-Duration: 0.80s
+ Real time factor: 90.5018
+ UPS: 1900.089606
+Vehicles: 
  Inserted: 21
  Running: 21
  Waiting: 0
+
 DijkstraRouter answered 20 queries and explored 1.00 edges on average.
 DijkstraRouter spent 0.00s answering queries (0.00ms on average).
