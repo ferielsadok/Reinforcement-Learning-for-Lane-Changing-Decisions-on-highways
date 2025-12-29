@@ -10,7 +10,8 @@ traci.start([
     "--start", "true",
     "--collision.action", "warn",
     "--xml-validation", "never",
-    "--log", "log"
+    "--log", "log",
+    "--quit-on-end", "false"   # ✅ prevent auto close
 ])
 
 ego_id = "vehAgent"
@@ -47,13 +48,14 @@ for step in range(200):
             traci.vehicle.setLaneChangeMode(veh, 0)
             traci.vehicle.setSpeed(veh, 0)
     
-    # Manual lane change: step 50 -> lane 1, step 100 -> lane 0
+    # Manual lane change
     if step == 50:
         traci.vehicle.changeLane(ego_id, 1, 10)
     if step == 100:
         traci.vehicle.changeLane(ego_id, 0, 10)
     
     traci.simulationStep()
+    time.sleep(0.1)   # ✅ slow down so you can see it
     
     # Print status
     lane_index = traci.vehicle.getLaneIndex(ego_id)
