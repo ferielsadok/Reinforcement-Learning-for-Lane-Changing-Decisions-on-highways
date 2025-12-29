@@ -1,6 +1,8 @@
 <routes>
 		<route id="r_0" edges="E0"/>
 		<vType id="obstacle" vClass="passenger" />
+
+
     <trip id="t1_0" depart="0.00" type="obstacle" departPos="100.0" color="255,16,0" departLane="1" from="E0" to="E0"/>
     <trip id="t0_0" depart="0.00" type="obstacle" departPos="50" color="255,16,0" departLane="0" from="E0" to="E0"/>
     <trip id="t1_1" depart="0.00" type="obstacle" departPos="200.0" color="255,16,0" departLane="1" from="E0" to="E0"/>
