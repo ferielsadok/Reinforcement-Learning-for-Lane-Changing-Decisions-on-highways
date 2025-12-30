@@ -1,3 +1,5 @@
+import os
+import time
 import traci
 import numpy as np
 import gym
@@ -8,7 +10,9 @@ class SumoContinuousEnv(gym.Env):
     def __init__(self, sumo_cfg="data/obstacles.sumocfg", max_steps=200):
         super().__init__()
 
-        self.sumo_cfg = sumo_cfg
+        # Configuration SUMO
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        self.sumo_cfg = os.path.join(base_dir, sumo_cfg)
         self.max_steps = max_steps
         self.ego_id = "vehAgent"
         self.step_count = 0
@@ -24,6 +28,10 @@ class SumoContinuousEnv(gym.Env):
         )
 
     def get_state(self):
+        # ⚠ Vérification que le véhicule existe
+        if self.ego_id not in traci.vehicle.getIDList():
+            raise RuntimeError(f"Vehicle '{self.ego_id}' not known in SUMO")
+
         lane = traci.vehicle.getLaneIndex(self.ego_id)
 
         leader = traci.vehicle.getLeader(self.ego_id, dist=100)
@@ -58,6 +66,7 @@ class SumoContinuousEnv(gym.Env):
         return r_speed + r_lane_change + r_collision
 
     def reset(self):
+        # Lancer SUMO
         traci.start([
             "sumo-gui",
             "-c", self.sumo_cfg,
@@ -66,9 +75,9 @@ class SumoContinuousEnv(gym.Env):
             "--xml-validation", "never",
             "--quit-on-end", "false"
         ])
-
         self.step_count = 0
 
+        # Ajouter le véhicule ego
         traci.vehicle.add(
             self.ego_id,
             "r_0",
@@ -76,20 +85,29 @@ class SumoContinuousEnv(gym.Env):
             depart=0
         )
 
-        # IMPORTANT: allow SUMO to initialize the vehicle
-        traci.simulationStep()
+        # ⚡ Attendre que le véhicule soit bien enregistré
+        for _ in range(10):
+            traci.simulationStep()
+            if self.ego_id in traci.vehicle.getIDList():
+                break
+        else:
+            raise RuntimeError(f"Vehicle '{self.ego_id}' was not added in SUMO")
 
-        # Freeze other vehicles
+        # Freeze les autres véhicules
         for veh in traci.vehicle.getIDList():
             if veh != self.ego_id:
                 traci.vehicle.setLaneChangeMode(veh, 0)
                 traci.vehicle.setSpeed(veh, 0)
 
+        # Bloquer le lane change du véhicule ego
         traci.vehicle.setLaneChangeMode(self.ego_id, 0)
 
         return self.get_state()
 
     def step(self, action):
+        if self.ego_id not in traci.vehicle.getIDList():
+            raise RuntimeError(f"Vehicle '{self.ego_id}' disappeared in SUMO")
+
         lane = traci.vehicle.getLaneIndex(self.ego_id)
         lane_valid = True
 
@@ -98,7 +116,6 @@ class SumoContinuousEnv(gym.Env):
                 traci.vehicle.changeLane(self.ego_id, lane - 1, 50)
             else:
                 lane_valid = False
-
         elif action == 2:
             if lane < 1:
                 traci.vehicle.changeLane(self.ego_id, lane + 1, 50)
@@ -117,3 +134,4 @@ class SumoContinuousEnv(gym.Env):
 
     def close(self):
         traci.close()
+
