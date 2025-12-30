@@ -20,7 +20,7 @@ nbr_episode = 500  # Augmenté pour un vrai apprentissage
 
 n_state = 18
 n_actions = 3
-
+HISTORY_PATH = "src/rewards_history.npy"
 # --- INITIALISATION OU CHARGEMENT DE LA Q-TABLE ---
 if os.path.exists("q_table_highway.npy"):
     q_table = np.load("q_table_highway.npy")
@@ -78,7 +78,8 @@ env.close()
 # --- SAUVEGARDE DE LA Q-TABLE ---
 np.save("q_table_highway.npy", q_table)
 print("--- Q-Table sauvegardée sous le nom 'q_table_highway.npy' ---")
-
+np.save(HISTORY_PATH, np.array(rewards_history))
+print("--- Q-Table et Historique sauvegardés dans src/ ---")
 # --- AFFICHAGE DES COURBES ---
 plt.figure(figsize=(12, 5))
 plt.subplot(1, 2, 1)
